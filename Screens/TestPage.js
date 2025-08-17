@@ -1,3 +1,4 @@
+import LottieView from 'lottie-react-native';
 import React, { useState } from 'react';
 import {
   View,
@@ -6,7 +7,7 @@ import {
   StyleSheet,
   FlatList,
 } from 'react-native';
-
+import Sound from 'react-native-sound';
 const questions = [
   {
     id: 1,
@@ -38,9 +39,10 @@ const questions = [
 const TestPage = ({ route }) => {
   const { testName } = route.params;
   const [selectedOptions, setSelectedOptions] = useState({});
+  const [blast, setBlast] = useState(false);
   const [totalScore, setTotalScore] = useState(0);
-
   const handleSelect = (qId, optionIndex, correctIndex) => {
+    setBlast(false);
     if (selectedOptions[qId] !== undefined) return; // prevent reselect
     setSelectedOptions({
       ...selectedOptions,
@@ -48,6 +50,31 @@ const TestPage = ({ route }) => {
     });
     if (optionIndex === correctIndex) {
       setTotalScore(prev => prev + 1);
+      setBlast(false);
+      setTimeout(() => {
+        setBlast(true);
+      }, 10);
+      // Play wow sound
+      const sound = new Sound('wow.mp3', Sound.MAIN_BUNDLE, error => {
+        if (error) {
+          console.log('Failed to load sound', error);
+          return;
+        }
+        sound.play(() => {
+          sound.release(); // free up memory after playing
+        });
+      });
+    } else {
+      // Play wow sound
+      const sound = new Sound('wrong.mp3', Sound.MAIN_BUNDLE, error => {
+        if (error) {
+          console.log('Failed to load sound', error);
+          return;
+        }
+        sound.play(() => {
+          sound.release(); // free up memory after playing
+        });
+      });
     }
   };
 
@@ -90,6 +117,31 @@ const TestPage = ({ route }) => {
           );
         }}
       />
+      {blast && (
+        <View
+          pointerEvents="none" // ✅ wrapper ignores touches
+          style={{
+            position: 'absolute',
+            top: -230,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 999,
+            backgroundColor: 'transparent',
+          }}
+        >
+          <LottieView
+            source={require('../Gif/Confetti.json')}
+            autoPlay
+            loop={false}
+            style={{
+              width: '100%',
+              height: '100%',
+            }}
+            onAnimationFinish={() => setBlast(false)}
+          />
+        </View>
+      )}
     </View>
   );
 };
