@@ -1,6 +1,5 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
-// import Ionicons from 'react-native-vector-icons/file-pen-line';
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import {
   View,
@@ -9,6 +8,7 @@ import {
   TouchableOpacity,
   FlatList,
 } from 'react-native';
+import axios from 'axios';
 
 const tests = [
   { id: '1', name: 'Math Test', level: 'Level I' },
@@ -16,12 +16,26 @@ const tests = [
 ];
 
 const LandingPage = ({ navigation }) => {
+  const [test, setTest] = useState([]);
   const navigate = useNavigation();
+  useEffect(() => {
+    fetchPosts();
+  }, []);
+  const fetchPosts = async () => {
+    try {
+      const response = await axios(
+        'https://68a169876f8c17b8f5d9c4b0.mockapi.io/get/tests/tests',
+      );
+      setTest(response.data);
+    } catch (error) {
+      console.error('Error fetching posts:', error);
+    }
+  };
   return (
     <View style={styles.container}>
       <Text style={styles.text}>Available Tests</Text>
       <FlatList
-        data={tests}
+        data={test}
         keyExtractor={item => item.id}
         renderItem={({ item }) => (
           <TouchableOpacity
@@ -33,7 +47,7 @@ const LandingPage = ({ navigation }) => {
             <View style={styles.cardContent}>
               <View>
                 <Text style={styles.title}>{item.name}</Text>
-                <Text style={styles.level}>{item.level}</Text>
+                <Text style={styles.level}>Level {item.level}</Text>
               </View>
               <FontAwesome6 name="file-pen" size={30} color="black" />
             </View>
