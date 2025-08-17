@@ -1,5 +1,7 @@
 import React from 'react';
 import { useNavigation } from '@react-navigation/native';
+// import Ionicons from 'react-native-vector-icons/file-pen-line';
+import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import {
   View,
   Text,
@@ -28,8 +30,13 @@ const LandingPage = ({ navigation }) => {
               navigate.navigate('TestPage', { testName: item.name })
             }
           >
-            <Text style={styles.title}>{item.name}</Text>
-            <Text style={styles.level}>{item.level}</Text>
+            <View style={styles.cardContent}>
+              <View>
+                <Text style={styles.title}>{item.name}</Text>
+                <Text style={styles.level}>{item.level}</Text>
+              </View>
+              <FontAwesome6 name="file-pen" size={30} color="black" />
+            </View>
           </TouchableOpacity>
         )}
       />
@@ -38,13 +45,23 @@ const LandingPage = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20 },
+  container: {
+    flex: 1,
+    padding: 20,
+    paddingTop: 70,
+    backgroundColor: '#FCDFBB',
+  },
   card: {
     padding: 20,
     marginBottom: 15,
-    backgroundColor: '#fff',
+    backgroundColor: '#FEF3E7',
     borderRadius: 10,
     elevation: 3,
+  },
+  cardContent: {
+    flexDirection: 'row',
+    justifyContent: 'space-between', // text left, icon right
+    alignItems: 'center',
   },
   text: {
     color: 'black',

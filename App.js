@@ -10,8 +10,19 @@ const App = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator>
-        <Stack.Screen name="Landing" component={LandingPage} />
-        <Stack.Screen name="TestPage" component={TestPage} />
+        <Stack.Screen
+          name="Landing"
+          component={LandingPage}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="TestPage"
+          component={TestPage}
+          options={{
+            headerBackTitleVisible: false,
+            title: '',
+          }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );

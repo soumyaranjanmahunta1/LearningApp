@@ -95,7 +95,7 @@ const TestPage = ({ route }) => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 15, backgroundColor: '#f9f9f9' },
+  container: { flex: 1, padding: 15, backgroundColor: '#FCDFBB' },
   header: { fontSize: 22, fontWeight: 'bold', marginBottom: 15 },
   score: {
     fontSize: 18,
@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderRadius: 8,
     marginBottom: 8,
-    backgroundColor: '#fff',
+    backgroundColor: '#FEF3E7',
   },
 });
 export default TestPage;
