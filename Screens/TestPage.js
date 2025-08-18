@@ -1,5 +1,6 @@
+import axios from 'axios';
 import LottieView from 'lottie-react-native';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -8,37 +9,37 @@ import {
   FlatList,
 } from 'react-native';
 import Sound from 'react-native-sound';
-const questions = [
-  {
-    id: 1,
-    question: 'What is 2 + 2 ?',
-    options: ['2', '3', '4', '5'],
-    correctIndex: 2,
-  },
-  {
-    id: 2,
-    question: 'What is capital of France?',
-    options: ['Berlin', 'Madrid', 'Paris', 'Rome'],
-    correctIndex: 2,
-  },
-  {
-    id: 3,
-    question: 'What is 7 + 2 ?',
-    options: ['9', '3', '4', '5'],
-    correctIndex: 0,
-  },
-  {
-    id: 4,
-    question: 'What is 2 - 2 ?',
-    options: ['2', '3', '0', '5'],
-    correctIndex: 2,
-  },
-  // ... total 10 questions
-];
-
+// const questions = [
+//   {
+//     id: 1,
+//     question: 'What is 2 + 2 ?',
+//     options: ['2', '3', '4', '5'],
+//     correctIndex: 2,
+//   },
+//   {
+//     id: 2,
+//     question: 'What is capital of France?',
+//     options: ['Berlin', 'Madrid', 'Paris', 'Rome'],
+//     correctIndex: 2,
+//   },
+//   {
+//     id: 3,
+//     question: 'What is 7 + 2 ?',
+//     options: ['9', '3', '4', '5'],
+//     correctIndex: 0,
+//   },
+//   {
+//     id: 4,
+//     question: 'What is 2 - 2 ?',
+//     options: ['2', '3', '0', '5'],
+//     correctIndex: 2,
+//   },
+//   // ... total 10 questions
+// ];
 const TestPage = ({ route }) => {
-  const { testName } = route.params;
+  const { testName, testId } = route.params;
   const [selectedOptions, setSelectedOptions] = useState({});
+  const [questions, setQuestions] = useState([]);
   const [blast, setBlast] = useState(false);
   const [totalScore, setTotalScore] = useState(0);
   const handleSelect = (qId, optionIndex, correctIndex) => {
@@ -77,7 +78,21 @@ const TestPage = ({ route }) => {
       });
     }
   };
-
+  useEffect(() => {
+    fetchQuestions();
+  }, []);
+  const fetchQuestions = async () => {
+    try {
+      const response = await axios(
+        `https://68a169876f8c17b8f5d9c4b0.mockapi.io/get/tests/getQuestions?testId=${Number(
+          testId,
+        )}`,
+      );
+      setQuestions(response.data);
+    } catch (error) {
+      console.error('Error fetching posts:', error);
+    }
+  };
   return (
     <View style={styles.container}>
       <Text style={styles.header}>{testName}</Text>

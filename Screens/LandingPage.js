@@ -9,18 +9,17 @@ import {
   FlatList,
 } from 'react-native';
 import axios from 'axios';
-
-const tests = [
-  { id: '1', name: 'Math Test', level: 'Level I' },
-  { id: '2', name: 'Science Test', level: 'Level II' },
-];
+import LottieView from 'lottie-react-native';
 
 const LandingPage = ({ navigation }) => {
   const [test, setTest] = useState([]);
+  const [loading, setLoading] = useState(true); // 👈 show animation first
   const navigate = useNavigation();
+
   useEffect(() => {
     fetchPosts();
   }, []);
+
   const fetchPosts = async () => {
     try {
       const response = await axios(
@@ -29,8 +28,27 @@ const LandingPage = ({ navigation }) => {
       setTest(response.data);
     } catch (error) {
       console.error('Error fetching posts:', error);
+    } finally {
+      // 👇 Keep splash for 2.5s, then show LandingPage
+      setTimeout(() => setLoading(false), 2500);
     }
   };
+
+  if (loading) {
+    return (
+      <View style={styles.splashContainer}>
+        <LottieView
+          source={require('../Gif/study.json')}
+          autoPlay
+          loop={false}
+          style={{ width: 350, height: 350 }}
+        />
+        <Text style={styles.splashText}>Welcome to Smart Study</Text>
+        <Text style={styles.tagLine}>Study Less, Learn More</Text>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <Text style={styles.text}>Available Tests</Text>
@@ -41,7 +59,10 @@ const LandingPage = ({ navigation }) => {
           <TouchableOpacity
             style={styles.card}
             onPress={() =>
-              navigate.navigate('TestPage', { testName: item.name })
+              navigate.navigate('TestPage', {
+                testName: item.name,
+                testId: item.id,
+              })
             }
           >
             <View style={styles.cardContent}>
@@ -59,6 +80,23 @@ const LandingPage = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
+  splashContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#FCDFBB',
+  },
+  splashText: {
+    marginTop: 20,
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#27054F',
+  },
+  tagLine: {
+    fontSize: 16,
+    color: '#27054F',
+    fontStyle: 'italic',
+  },
   container: {
     flex: 1,
     padding: 20,
