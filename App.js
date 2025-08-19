@@ -4,6 +4,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import LandingPage from './Screens/LandingPage';
 import Result from './Screens/Result';
+import Exam from './Screens/Exam';
 
 import TestPage from './Screens/TestPage';
 import { createDrawerNavigator } from '@react-navigation/drawer';
@@ -34,7 +35,7 @@ const HomeTabs = () => (
   >
     <Tab.Screen name="Result" component={Result} />
     <Tab.Screen name="Home" component={LandingPage} />
-    <Tab.Screen name="Exams" component={LandingPage} />
+    <Tab.Screen name="Exams" component={Exam} />
   </Tab.Navigator>
 );
 const App = () => {
