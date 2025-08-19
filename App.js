@@ -28,7 +28,7 @@ const HomeTabs = () => (
         }
         return <Ionicons name={iconName} size={size} color={color} />;
       },
-      tabBarActiveTintColor: 'blue',
+      tabBarActiveTintColor: '#FABB82',
       tabBarInactiveTintColor: 'gray',
       headerShown: false,
     })}
