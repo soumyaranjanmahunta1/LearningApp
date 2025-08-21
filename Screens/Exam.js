@@ -26,15 +26,15 @@ const ExamCard = ({ item, navigate }) => {
 
     return () => clearInterval(interval); // cleanup
   }, [item.examDate]);
-
   return (
     <TouchableOpacity
       style={[styles.card, !isExamLive && { opacity: 0.5 }]}
       disabled={!isExamLive}
       onPress={() =>
-        navigate.navigate('TestPage', {
+        navigate.navigate('ExamHall', {
           testName: item.name,
           testId: item.id,
+          examDuration: item.examDuration,
         })
       }
     >
@@ -55,26 +55,7 @@ const ExamCard = ({ item, navigate }) => {
 };
 
 const Exam = () => {
-  const [exam, setExam] = useState([
-    {
-      id: '1',
-      name: 'Math Test',
-      level: 'Easy',
-      examDate: '2025-08-18T10:30:00Z',
-    },
-    {
-      id: '2',
-      name: 'Science Test',
-      level: 'Medium',
-      examDate: '2025-08-19T03:79:00Z', // fixed invalid time 03:69
-    },
-    {
-      id: '3',
-      name: 'English Test',
-      level: 'Hard',
-      examDate: '2025-08-25T09:00:00Z',
-    },
-  ]);
+  const [exam, setExam] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigation();
 
@@ -85,29 +66,10 @@ const Exam = () => {
   const fetchPosts = async () => {
     try {
       const response = await axios(
-        'https://68a169876f8c17b8f5d9c4b0.mockapi.io/get/tests/tests',
+        'https://68a5c4352a3deed2960ec9d6.mockapi.io/exams',
       );
       // Example: replace with response.data when ready
-      setExam([
-        {
-          id: '1',
-          name: 'Math Test',
-          level: 'Easy',
-          examDate: '2025-08-18T10:30:00Z',
-        },
-        {
-          id: '2',
-          name: 'Science Test',
-          level: 'Medium',
-          examDate: '2025-08-19T03:79:00Z',
-        },
-        {
-          id: '3',
-          name: 'English Test',
-          level: 'Hard',
-          examDate: '2025-08-25T09:00:00Z',
-        },
-      ]);
+      setExam(response.data);
     } catch (error) {
       console.error('Error fetching posts:', error);
     } finally {
