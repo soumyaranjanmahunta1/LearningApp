@@ -51,30 +51,44 @@ const LandingPage = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Available Tests</Text>
-      <FlatList
-        data={test}
-        keyExtractor={item => item.id}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            style={styles.card}
-            onPress={() =>
-              navigate.navigate('TestPage', {
-                testName: item.name,
-                testId: item.id,
-              })
-            }
-          >
-            <View style={styles.cardContent}>
-              <View>
-                <Text style={styles.title}>{item.name}</Text>
-                <Text style={styles.level}>Level {item.level}</Text>
-              </View>
-              <FontAwesome6 name="file-pen" size={30} color="black" />
-            </View>
-          </TouchableOpacity>
-        )}
-      />
+      {test.length === 0 ? (
+        <View style={styles.noDataContainer}>
+          <LottieView
+            source={require('../Gif/empty box3.json')}
+            autoPlay
+            loop
+            style={{ width: 350, height: 350 }}
+          />
+          <Text style={styles.noDataText}>No Test Available</Text>
+        </View>
+      ) : (
+        <View>
+          <Text style={styles.text}>Available Tests</Text>
+          <FlatList
+            data={test}
+            keyExtractor={item => item.id}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                style={styles.card}
+                onPress={() =>
+                  navigate.navigate('TestPage', {
+                    testName: item.name,
+                    testId: item.id,
+                  })
+                }
+              >
+                <View style={styles.cardContent}>
+                  <View>
+                    <Text style={styles.title}>{item.name}</Text>
+                    <Text style={styles.level}>Level {item.level}</Text>
+                  </View>
+                  <FontAwesome6 name="file-pen" size={30} color="black" />
+                </View>
+              </TouchableOpacity>
+            )}
+          />
+        </View>
+      )}
     </View>
   );
 };
@@ -85,6 +99,17 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#FCDFBB',
+  },
+  noDataContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  noDataText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#777',
   },
   splashText: {
     marginTop: 20,

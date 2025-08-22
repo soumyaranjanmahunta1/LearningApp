@@ -13,11 +13,18 @@ const Result = () => {
       const response = await axios(
         'https://68a5f0502a3deed2960f6965.mockapi.io/resultData',
       );
-      setResultData(response.data);
+
+      // ✅ Sort each exam's results in descending order by marks
+      const sortedData = response.data.map(exam => ({
+        ...exam,
+        results: [...exam.results].sort((a, b) => b.mark - a.mark),
+      }));
+
+      setResultData(sortedData);
     } catch (error) {
       console.error('Error fetching results:', error);
     } finally {
-      setTimeout(() => setLoading(false), 1000); // smooth animation
+      setTimeout(() => setLoading(false), 1000);
     }
   };
 
@@ -64,6 +71,9 @@ const Result = () => {
 
               {/* Table Header */}
               <View style={[styles.row, styles.headerRow]}>
+                <Text style={[styles.cell, styles.headerCell, { flex: 0.5 }]}>
+                  #
+                </Text>
                 <Text style={[styles.cell, styles.headerCell]}>
                   Student Name
                 </Text>
@@ -79,6 +89,7 @@ const Result = () => {
                     idx % 2 === 0 ? styles.evenRow : styles.oddRow,
                   ]}
                 >
+                  <Text style={[styles.cell, { flex: 0.5 }]}>{idx + 1}</Text>
                   <Text style={styles.cell}>{student.name}</Text>
                   <Text style={styles.cell}>{student.mark}</Text>
                 </View>

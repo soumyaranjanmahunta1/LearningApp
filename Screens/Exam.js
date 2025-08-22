@@ -92,11 +92,25 @@ const Exam = () => {
 
   return (
     <View style={styles.container}>
-      <FlatList
-        data={exam}
-        keyExtractor={item => item.id}
-        renderItem={({ item }) => <ExamCard item={item} navigate={navigate} />}
-      />
+      {exam.length === 0 ? (
+        <View style={styles.noDataContainer}>
+          <LottieView
+            source={require('../Gif/empty box3.json')}
+            autoPlay
+            loop
+            style={{ width: 350, height: 350 }}
+          />
+          <Text style={styles.noDataText}>No Exam Available</Text>
+        </View>
+      ) : (
+        <FlatList
+          data={exam}
+          keyExtractor={item => item.id}
+          renderItem={({ item }) => (
+            <ExamCard item={item} navigate={navigate} />
+          )}
+        />
+      )}
     </View>
   );
 };
@@ -113,6 +127,17 @@ const styles = StyleSheet.create({
     padding: 20,
     paddingTop: 70,
     backgroundColor: '#FCDFBB',
+  },
+  noDataContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  noDataText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#777',
   },
   card: {
     padding: 20,

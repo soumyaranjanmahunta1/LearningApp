@@ -105,7 +105,9 @@ const TestPage = ({ route }) => {
           const selected = selectedOptions[item.id];
           return (
             <View style={styles.questionBlock}>
-              <Text style={styles.question}>{item.question}</Text>
+              <Text style={styles.question}>
+                {item.id}. {item.question}
+              </Text>
               {item.options.map((opt, index) => {
                 let borderColor = '#ccc';
                 if (selected !== undefined) {

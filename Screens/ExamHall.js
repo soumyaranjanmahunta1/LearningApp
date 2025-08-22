@@ -59,14 +59,21 @@ const ExamHall = ({ route, navigation }) => {
   const handleSelect = (qId, optionIndex, correctIndex) => {
     setBlast(false);
     if (selectedOptions[qId] !== undefined) return;
+
+    const isCorrect = optionIndex === correctIndex;
+
     setSelectedOptions(prev => {
       const updated = { ...prev, [qId]: optionIndex };
       AsyncStorage.setItem(`answers_${testId}`, JSON.stringify(updated));
       return updated;
     });
-    if (optionIndex === correctIndex) {
-      setTotalScore(prev => prev + 1);
+
+    if (isCorrect) {
+      const newScore = totalScore + 1;
+      setTotalScore(newScore);
+      AsyncStorage.setItem(`score_${testId}`, String(newScore)); // ✅ save score
       setTimeout(() => setBlast(true), 10);
+
       const sound = new Sound('wow.mp3', Sound.MAIN_BUNDLE, error => {
         if (!error) sound.play(() => sound.release());
       });
@@ -86,15 +93,11 @@ const ExamHall = ({ route, navigation }) => {
     }
     try {
       const apiUrl = 'https://68a5f0502a3deed2960f6965.mockapi.io/resultData';
-
-      // 1. Fetch all exams to check if exam exists
       const { data } = await axios.get(apiUrl);
 
-      // Check if exam already exists
       const existingExam = data.find(exam => exam.exam === testName);
 
       if (existingExam) {
-        // 2. If exam exists → update it (PUT)
         const updatedResults = [
           ...existingExam.results,
           { name, mark: totalScore },
@@ -105,7 +108,6 @@ const ExamHall = ({ route, navigation }) => {
           results: updatedResults,
         });
       } else {
-        // 3. If exam doesn’t exist → create new (POST)
         await axios.post(apiUrl, {
           exam: testName,
           results: [{ name, mark: totalScore }],
@@ -113,15 +115,11 @@ const ExamHall = ({ route, navigation }) => {
       }
       setShowFinishModal(true);
 
-      // Clear local storage
+      // Clear storage
       await AsyncStorage.removeItem(`timer_${testId}`);
       await AsyncStorage.removeItem(`answers_${testId}`);
       await AsyncStorage.removeItem(`name_${testId}`);
-
-      // Navigate back
-      //   setTimeout(() => {
-      //     navigation.goBack();
-      //   }, 2000);
+      await AsyncStorage.removeItem(`score_${testId}`);
     } catch (error) {
       console.error('Error saving result:', error);
       Toast.show({
@@ -135,15 +133,13 @@ const ExamHall = ({ route, navigation }) => {
   useEffect(() => {
     fetchQuestions();
     restoreSession();
-    // return () => {
-    //   if (timerRef.current) clearInterval(timerRef.current);
-    // };
   }, []);
 
   const restoreSession = async () => {
     const savedName = await AsyncStorage.getItem(`name_${testId}`);
     const savedAnswers = await AsyncStorage.getItem(`answers_${testId}`);
     const savedTimer = await AsyncStorage.getItem(`timer_${testId}`);
+    const savedScore = await AsyncStorage.getItem(`score_${testId}`);
 
     if (savedName) {
       setName(savedName);
@@ -151,6 +147,7 @@ const ExamHall = ({ route, navigation }) => {
     }
     if (savedAnswers) setSelectedOptions(JSON.parse(savedAnswers));
     if (savedTimer) startTimer(Number(savedTimer));
+    if (savedScore) setTotalScore(Number(savedScore)); // ✅ restore score
   };
 
   const fetchQuestions = async () => {
@@ -257,7 +254,6 @@ const ExamHall = ({ route, navigation }) => {
                 flatListRef.current.scrollToIndex({ index: currentIndex + 1 })
               }
             >
-              {/* <Text style={styles.arrow}>{'➡️'}</Text> */}
               <Icon name="navigate-next" size={70} color="#615445" />
             </TouchableOpacity>
           )}
@@ -323,41 +319,42 @@ const ExamHall = ({ route, navigation }) => {
           </View>
         </View>
       </Modal>
+
       {/* Finish Modal */}
       <Modal visible={showFinishModal} transparent animationType="fade">
         <View style={styles.finishModalContainer}>
           <View style={styles.finishBox}>
-            {/* ❌ Cross button */}
             <TouchableOpacity
               style={styles.closeIcon}
               onPress={() => {
                 setShowFinishModal(false);
-                navigation.goBack(); // go back after closing
+                navigation.goBack();
               }}
             >
               <Entypo name="circle-with-cross" size={28} color="red" />
             </TouchableOpacity>
 
-            <LottieView
-              source={require('../Gif/Get things done.json')}
-              autoPlay
-              loop={false}
-              style={{ width: 350, height: 350 }}
-              pointerEvents="none"
-            />
+            <View style={styles.resultContainer}>
+              <LottieView
+                source={require('../Gif/Get things done.json')}
+                autoPlay
+                loop={false}
+                style={{ width: 200, height: 200 }}
+                pointerEvents="none"
+              />
 
-            <View style={styles.scoreContainer}>
-              <View style={styles.scoreCircle}>
-                <Text style={styles.scoreAchieved}>{totalScore}</Text>
-                <View style={styles.divider} />
-                <Text style={styles.scoreTotal}>{questions.length}</Text>
+              <View style={styles.scoreContainer}>
+                <View style={styles.scoreCircle}>
+                  <Text style={styles.scoreAchieved}>{totalScore}</Text>
+                  <View style={styles.divider} />
+                  <Text style={styles.scoreTotal}>{questions.length}</Text>
+                </View>
               </View>
             </View>
           </View>
         </View>
       </Modal>
 
-      {/* Toast */}
       <Toast />
     </View>
   );
@@ -378,12 +375,17 @@ const styles = StyleSheet.create({
     width: '85%',
     position: 'relative',
   },
-  scoreContainer: {
+  resultContainer: {
+    flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: -40,
+    marginTop: 20,
   },
-
+  scoreContainer: {
+    marginLeft: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   scoreCircle: {
     width: 120,
     height: 120,
@@ -392,37 +394,30 @@ const styles = StyleSheet.create({
     borderColor: 'green',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#fff',
-    paddingVertical: 10,
   },
-
   scoreAchieved: {
     fontSize: 28,
     fontWeight: 'bold',
     color: 'green',
   },
-
   divider: {
     width: '60%',
     height: 2,
     backgroundColor: 'green',
     marginVertical: 5,
   },
-
   scoreTotal: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: '#333',
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: 'green',
   },
-
   closeIcon: {
     position: 'absolute',
     top: 10,
     right: 10,
-    zIndex: 10, // 👈 ensures it's above Lottie
-    elevation: 10, // 👈 required for Android
+    zIndex: 10,
+    elevation: 10,
   },
-
   container: { flex: 1, backgroundColor: '#FCDFBB' },
   headerRow: {
     flexDirection: 'row',
@@ -483,7 +478,7 @@ const styles = StyleSheet.create({
   },
   arrowContainer: {
     position: 'absolute',
-    top: height * 0.3, // ✅ Vertically aligned with card
+    top: height * 0.3,
     zIndex: 1000,
   },
   arrow: { fontSize: 32 },
